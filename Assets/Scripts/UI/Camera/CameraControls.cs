@@ -11,9 +11,10 @@ public class CameraControls : MonoBehaviour
     [SerializeField]
     private int index;
  
-
+    
 void Start()
     {
+        // store all the Camera objects inside the Parent Object and add them to an index
         cameras = new GameObject[transform.childCount];
         // fill in the cameras
     for (int i =0;  i< transform.childCount; i++)
@@ -39,6 +40,7 @@ void Start()
         //Toggle off the current camera
         cameras[index].SetActive(false);
         index++;
+        // Swtich between cameras based on the index it is at
         if (index < 0)
         {
             index = cameras.Length - 1;

@@ -5,13 +5,16 @@ using UnityEngine.UI;
 
 public class RunMatch : DataAnalysis
 {
+    //sliders that control the match
     public Slider FrameSlider;
     public Slider FrameSpeedSlider;
     // Ball
     [SerializeField] private GameObject _ball;
 
-    // FPS
+    // FPS is for the speed of which the match plays at per frame
     [SerializeField] private int _fps = 25;
+
+    //booleans for the playback of the match
 
     public bool play;
    
@@ -36,13 +39,14 @@ public class RunMatch : DataAnalysis
       
         // Move ball
         _ball.transform.position = ballPosDict[framecontrol + 26606];
-
+        // Play allows the match to start based on the speed given
         if (play)
         {
             FrameSlider.value += _fps * Time.deltaTime;
 
 
         }
+        // Run the match backward
         if (reverse)
         {
             FrameSlider.value -= _fps * Time.deltaTime;
@@ -52,6 +56,7 @@ public class RunMatch : DataAnalysis
 
       
     }
+    // Button functions to play, puase reverse, or rest the match
     public void PlaySequence()
     {
 

@@ -20,11 +20,12 @@ public class Cameramaovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        // use axis input to move the camera horzantally
         if (Input.GetAxisRaw("Horizontal") != 0 || verticalInput != 0)
         {
             transform.position += moveSpeed * new Vector3(horizontalInput, 0, verticalInput);
         }
-
+        // use the mouse scrool to zoom/ move the camera vertically
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
             transform.position += scrollSpeed * new Vector3(0, -Input.GetAxis("Mouse ScrollWheel"), 0);

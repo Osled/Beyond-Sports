@@ -11,6 +11,7 @@ public class PlayerData : MonoBehaviour
 
     void Start()
     {
+        // Give the text the Name of the Player, which is the player number 
         m_MyText.text = this.gameObject.name;
     }
 

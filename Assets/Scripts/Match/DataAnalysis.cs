@@ -15,6 +15,10 @@ public class DataAnalysis : MonoBehaviour
     [SerializeField]
     private float _feildScale;
 
+    //sting to allow any data to be replaced into the simulation
+    [SerializeField]
+    public string DatasetA = "Assets/Data/Applicant-test.dat";
+
     // Player positions
     private List<KeyValuePair<string, Vector3>> playerPos = new List<KeyValuePair<string, Vector3>>();
 
@@ -27,7 +31,7 @@ public class DataAnalysis : MonoBehaviour
     private void Awake()
     {
         // Collect Datafile from .dat
-        Dataset = "Assets/Data/Applicant-test.dat";
+        Dataset = DatasetA;
 
         // collect data from the file, function using the .dat file
         CollectData(Dataset);
@@ -130,7 +134,7 @@ public class DataAnalysis : MonoBehaviour
                 }
             }
 
-            // Split ball data
+            // Apply the same technice for the ball data
             string[] ballData = values[2].Split(';');
             foreach (string ballDatas in ballData)
             {
