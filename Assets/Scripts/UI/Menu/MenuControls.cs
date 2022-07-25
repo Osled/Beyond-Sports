@@ -8,6 +8,21 @@ public class MenuControls : MonoBehaviour
     private GameObject _guide;
     [SerializeField]
     private GameObject _matchPlayer;
+
+    [SerializeField]
+    private GameObject _camera;
+    [SerializeField]
+    private GameObject _textGuide;
+
+
+    public void Update()
+    {
+        if (_camera.activeSelf == true)
+        {
+            _textGuide.SetActive(true);
+        }
+        else { _textGuide.SetActive(false); }
+    }
     public void Quit()
     {
         Application.Quit();
