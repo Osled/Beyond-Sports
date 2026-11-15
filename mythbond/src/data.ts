@@ -1,7 +1,7 @@
 // Content tables: companion lines, their forms, and dialogue.
 // Every humanoid form (stage 2+) is an adult; stages 0-1 are a charm and an animal familiar.
 
-export type LineId = "kitsune" | "succubus" | "elf" | "pixie";
+export type LineId = "kitsune" | "succubus" | "elf" | "pixie" | "seraph";
 export type Stage = 0 | 1 | 2 | 3;
 
 export interface Form {
@@ -48,8 +48,8 @@ export const LINES: Record<LineId, Line> = {
       seed: f("kitsune", 0, "seed", "Foxfire Charm", "Sealed spirit", "A paper charm that flickers with warm blue flame.", "🏮"),
       familiar: f("kitsune", 1, "familiar", "Emberkit", "Fox familiar", "A fluffy fox kit with a single glowing tail.", "🦊"),
       awakened: f("kitsune", 2, "awakened", "Akari", "Kitsune shrine maiden", "Three tails, a quick wit, and a fan she hides her grin behind.", "🦊"),
-      grace: f("kitsune", 3, "grace", "Akari, Nine-Tail Celestial", "Ascended · Grace", "Nine radiant tails and a calm that fills the whole shrine.", "✨"),
-      valor: f("kitsune", 3, "valor", "Akari, Stormfang Ronin", "Ascended · Valor", "A wandering blade wreathed in lightning foxfire.", "⚡"),
+      grace: f("kitsune", 3, "grace", "Akari, Moonveil Priestess", "Ascended · Grace", "A golden fox mask, a ringing shakujo, and a spirit fox that guards her back.", "✨"),
+      valor: f("kitsune", 3, "valor", "Akari, Stormfang", "Ascended · Valor", "Gold fox helm, armored bodysuit and a spear that cracks like thunder.", "⚡"),
     },
   },
   succubus: {
@@ -64,7 +64,7 @@ export const LINES: Record<LineId, Line> = {
       familiar: f("succubus", 1, "familiar", "Impwing", "Bat familiar", "A round little bat with a heart-tipped tail.", "🦇"),
       awakened: f("succubus", 2, "awakened", "Lilith", "Succubus enchantress", "Small horns, big attitude, and a teasing smile.", "😈"),
       grace: f("succubus", 3, "grace", "Lilith, Queen of Dusk", "Ascended · Grace", "A crowned sovereign of twilight, regal and devoted.", "👑"),
-      valor: f("succubus", 3, "valor", "Lilith, Nightblade", "Ascended · Valor", "A duelist whose wings cut the dark like sabres.", "🗡️"),
+      valor: f("succubus", 3, "valor", "Lilith, Shadebound", "Ascended · Valor", "Pale as moonlight, wrapped in chains, with a grinning shadow at her shoulder.", "⛓️"),
     },
   },
   elf: {
@@ -79,7 +79,7 @@ export const LINES: Record<LineId, Line> = {
       familiar: f("elf", 1, "familiar", "Glimmerfawn", "Fawn familiar", "A tiny fawn with leaf-shaped ears and starry spots.", "🦌"),
       awakened: f("elf", 2, "awakened", "Sylwen", "Elven ranger", "Sharp ears, sharper aim, and a soft spot for you.", "🧝‍♀️"),
       grace: f("elf", 3, "grace", "Sylwen, Moon Priestess", "Ascended · Grace", "Keeper of the silver grove, wrapped in moonlight.", "🌙"),
-      valor: f("elf", 3, "valor", "Sylwen, Wildwood Warden", "Ascended · Valor", "Armoured in living bark, bow drawn against the dark.", "🏹"),
+      valor: f("elf", 3, "valor", "Sylwen, Duskhunter", "Ascended · Valor", "A masked hunter in a torn black coat, twin crossbows always loaded.", "🏹"),
     },
   },
   pixie: {
@@ -94,7 +94,22 @@ export const LINES: Record<LineId, Line> = {
       familiar: f("pixie", 1, "familiar", "Glowmoth", "Moth familiar", "A fuzzy moth that leaves glitter wherever it lands.", "🦋"),
       awakened: f("pixie", 2, "awakened", "Faye", "Pixie of the flower court", "Gossamer wings and endless energy.", "🧚‍♀️"),
       grace: f("pixie", 3, "grace", "Faye, Aurora Queen", "Ascended · Grace", "Wings like the northern lights, crowned in blossoms.", "🌈"),
-      valor: f("pixie", 3, "valor", "Faye, Thornwing", "Ascended · Valor", "A rose-armoured rogue, fast as a hummingbird.", "🌹"),
+      valor: f("pixie", 3, "valor", "Faye, Thornwing", "Ascended · Valor", "A visored rose knight, fast as a hummingbird.", "🌹"),
+    },
+  },
+  seraph: {
+    id: "seraph",
+    name: "Seraph",
+    tagline: "Winged guardian of the starlit sky",
+    colors: ["#ffe7a8", "#2a2a6e"],
+    accent: "#ffd45c",
+    favoriteTreat: "angel cake",
+    forms: {
+      seed: f("seraph", 0, "seed", "Halo Feather", "Sealed spirit", "A single white feather ringed by a faint golden halo.", "🪶"),
+      familiar: f("seraph", 1, "familiar", "Dovelet", "Dove familiar", "A round little dove that glows when it coos.", "🕊️"),
+      awakened: f("seraph", 2, "awakened", "Celes", "Halo knight", "A visored knight with one pair of wings and a very strict sense of duty.", "😇"),
+      grace: f("seraph", 3, "grace", "Celes, Dawn Seraph", "Ascended · Grace", "Six white wings, gold armor and ribbons of light trailing behind her.", "🌅"),
+      valor: f("seraph", 3, "valor", "Celes, Fallen Seraph", "Ascended · Valor", "Black-winged and silver-haired, she fell on purpose, to protect you.", "🌑"),
     },
   },
 };
@@ -137,6 +152,14 @@ const TALK: Record<LineId, Record<Tone, string[]>> = {
     hungry: ["Even rangers can't hunt on an empty stomach.", "Some honey berries would be lovely..."],
     sleepy: ["The stars are out... sit with me until I drift off.", "*soft yawn* Forgive me."],
     sick: ["I should have known better than that cold stream...", "Your care is the best medicine."],
+  },
+  seraph: {
+    happy: ["Your arrival has been noted. And... appreciated.", "I polished my visor for you. Don't laugh.", "Stay. That is an order. A gentle one."],
+    neutral: ["I am on guard. Always.", "The stars are calm tonight."],
+    sad: ["A guardian with no one to guard... is only armor.", "I kept watch. You didn't come."],
+    hungry: ["Even the heavens run on angel cake.", "My halo is flickering. Food, please."],
+    sleepy: ["Permission to rest my wings?", "*yawn* ...the night watch is long."],
+    sick: ["My wings feel heavy... I'll be fine. Probably.", "Your care heals better than any blessing."],
   },
   pixie: {
     happy: ["You're here, you're here, you're HERE!", "I made your hair sparkle. You're welcome!", "Let's play! Or dance! Or both!"],

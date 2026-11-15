@@ -30,16 +30,23 @@ child version of any heroine.
 
 ## Cast
 
+Five lines. Evolved forms share one design language: eye-covering masks and visors, armored
+bodysuits with straps and belts, flowing ribbons, large wings, and a spirit familiar hovering
+behind the strongest forms. The two ascended branches of each line are a matched pair: a radiant
+**Grace** form and a darker, armored **Valor** form.
+
 | Line | Charm | Familiar | Awakened | Grace | Valor |
 |---|---|---|---|---|---|
-| Kitsune | Foxfire Charm | Emberkit | Akari, shrine maiden | Nine-Tail Celestial | Stormfang Ronin |
-| Succubus | Obsidian Sigil | Impwing | Lilith, enchantress | Queen of Dusk | Nightblade |
-| Elf | Moonleaf Seed | Glimmerfawn | Sylwen, ranger | Moon Priestess | Wildwood Warden |
-| Pixie | Dewdrop Bud | Glowmoth | Faye, flower court | Aurora Queen | Thornwing |
+| Kitsune | Foxfire Charm | Emberkit | Akari, shrine maiden | Moonveil Priestess: gold fox mask, shakujo staff, nine tails, spirit fox | Stormfang: gold fox helm, armored bodysuit, spear |
+| Succubus | Obsidian Sigil | Impwing | Lilith, enchantress | Queen of Dusk: crown, gown, ribbons | Shadebound: pale skin, chains, torn wings, red claws, shadow familiar |
+| Elf | Moonleaf Seed | Glimmerfawn | Sylwen, ranger | Moon Priestess: robes, moon staff | Duskhunter: blue mask, torn black coat, twin crossbows |
+| Pixie | Dewdrop Bud | Glowmoth | Faye, flower court | Aurora Queen: butterfly wings, scepter | Thornwing: rose visor, armor, daggers |
+| Seraph | Halo Feather | Dovelet | Celes, halo knight (visor, one pair of wings) | Dawn Seraph: six white wings, gold armor, pink ribbons | Fallen Seraph: six black wings, silver hair, violet ribbons |
 
 Personalities: Akari is playful and teasing; Lilith is proud and flirty but soft underneath;
-Sylwen is calm and devoted; Faye is hyperactive and mischievous. Each has her own dialogue for
-happy, neutral, sad, hungry, sleepy and sick moods.
+Sylwen is calm and devoted; Faye is hyperactive and mischievous; Celes is formal and dutiful and
+slowly learns to relax. Each has her own dialogue for happy, neutral, sad, hungry, sleepy and sick
+moods.
 
 ## Needs and stats
 

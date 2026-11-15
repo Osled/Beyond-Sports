@@ -1,7 +1,7 @@
 # Mythbond
 
 A 2D virtual-pet game for Android (and the web). You adopt a sealed spirit charm, care for it
-in real time, and it grows into a fantasy companion: a kitsune, succubus, elf or pixie.
+in real time, and it grows into a fantasy companion: a kitsune, succubus, elf, pixie or seraph.
 
 - Design: [docs/DESIGN.md](docs/DESIGN.md)
 - Character art prompts: [docs/ART_PROMPTS.md](docs/ART_PROMPTS.md)
