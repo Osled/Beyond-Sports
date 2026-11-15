@@ -8,6 +8,7 @@ let js = files.filter((f) => f.endsWith(".js")).map((f) => readFileSync(dir + f,
 for (const f of files.filter((f) => f.endsWith(".png"))) {
   const uri = "data:image/png;base64," + readFileSync(dir + f).toString("base64");
   js = js.split(`"./assets/${f}"`).join(JSON.stringify(uri)).split(`"/assets/${f}"`).join(JSON.stringify(uri));
+  js = js.split(`new URL("${f}",import.meta.url).href`).join(JSON.stringify(uri));
 }
 const html = `<title>Mythbond</title>
 <meta name="claude:viewport-fit-sides" content="cover">

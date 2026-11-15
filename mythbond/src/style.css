@@ -152,11 +152,11 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 }
 .screen::after { /* LCD pixel grid */
   content: "";
-  position: absolute; inset: 0; pointer-events: none; z-index: 6;
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
   opacity: var(--fade);
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.07) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 3px);
 }
-.stage { position: absolute; inset: 0; overflow: hidden; }
+.stage { position: absolute; inset: 0; overflow: hidden; z-index: 1; }
 .floor { opacity: var(--fade); position: absolute; left: 0; right: 0; bottom: 0; height: 14%; background: color-mix(in srgb, var(--c2) 40%, transparent); border-top: 2px solid color-mix(in srgb, var(--lcd-ink) 25%, transparent); }
 
 .pet {
@@ -173,7 +173,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pet.hop { animation: hop 0.38s steps(3) both; }
 .pet.charm .pet-img { animation: wob 1.2s steps(2) infinite; }
 .pet.wiggle .pet-img { animation: wiggle 0.36s steps(4); }
-.pet-img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; image-rendering: auto; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.18)); }
+.pet-img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.18)); }
 @keyframes hop { 50% { translate: 0 -16%; } }
 @keyframes wob { 50% { rotate: 8deg; } }
 @keyframes wiggle { 25% { rotate: -14deg; } 75% { rotate: 14deg; } }
@@ -201,6 +201,12 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   font-size: clamp(11px, 3.7cqi, 13.5px);
   line-height: 1.35;
 }
+
+.pet.pixel .pet-img, .adopt-opt img, .cell img { image-rendering: pixelated; }
+.pet.pixel .pet-img { filter: none; }
+.pet.pixel::after { content: ""; position: absolute; z-index: -1; left: 22%; right: 22%; bottom: -2px; height: 6px; border-radius: 50%; background: rgba(0, 0, 0, 0.22); }
+.pet.pixel { aspect-ratio: 130 / 160; }
+.pet.pixel.small { aspect-ratio: 1; }
 
 /* ---------- action effects ---------- */
 .fx { position: absolute; inset: 0; pointer-events: none; z-index: 2; }

@@ -38,10 +38,17 @@ export interface Look {
 }
 
 const INK = "#2a1740";
+// Sprite mode (used by scripts/make-sprites.mts): no ink strokes and no translucency, so the
+// drawing quantizes cleanly into pixel art; the sprite pipeline adds its own outline and shading.
+let SPRITE = false;
 const mirror = (s: string) => s + `<g transform="translate(200 0) scale(-1 1)">${s}</g>`;
-const p = (d: string, fill: string, extra = "") => `<path d="${d}" fill="${fill}" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round" ${extra}/>`;
-const line = (d: string, c: string, w: number, extra = "") => `<path d="${d}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" fill="none" ${extra}/>`;
-const inked = (d: string, c: string, w: number) => line(d, INK, w + 2.5) + line(d, c, w);
+const p = (d: string, fill: string, extra = "") =>
+  SPRITE ? `<path d="${d}" fill="${fill}" ${extra.replace(/(fill-)?opacity="[^"]*"/g, "")}/>` : `<path d="${d}" fill="${fill}" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round" ${extra}/>`;
+const line = (d: string, c: string, w: number, extra = "") => `<path d="${d}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" fill="none" ${SPRITE ? extra.replace(/opacity="[^"]*"/g, "") : extra}/>`;
+const inked = (d: string, c: string, w: number) => (SPRITE ? line(d, c, w + 1) : line(d, INK, w + 2.5) + line(d, c, w));
+const op = (v: string) => (SPRITE ? "1" : v);
+const darken = (hex: string, k: number) =>
+  "#" + [1, 3, 5].map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) * k).toString(16).padStart(2, "0")).join("");
 
 function tails(n: number, color: string, tip: string, big: boolean): string {
   const angles = n === 1 ? [75] : n === 3 ? [-72, 72, 104] : Array.from({ length: n }, (_, i) => -116 + (232 / (n - 1)) * i);
@@ -84,7 +91,7 @@ function wings(L: Look): string {
       break;
     }
     default: {
-      const o = L.wings === "butterfly" ? 0.8 : 0.55;
+      const o = SPRITE ? 1 : L.wings === "butterfly" ? 0.8 : 0.55;
       const rx = L.wings === "butterfly" ? 46 : 40;
       one =
         `<ellipse cx="146" cy="92" rx="${rx}" ry="${L.wings === "butterfly" ? 26 : 16}" transform="rotate(-32 146 92)" fill="${color}" fill-opacity="${o}" stroke="#fff" stroke-width="1.5"/>` +
@@ -97,14 +104,14 @@ function wings(L: Look): string {
 function familiar(kind: NonNullable<Look["familiar"]>): string {
   if (kind === "fox")
     return (
-      `<g opacity=".55">` +
-      `<path d="M150 70L162 18L178 54L196 48L190 86Q206 104 196 124L170 120Q150 112 140 96Z" fill="#9fe0ff" stroke="#e9fbff" stroke-width="2"/>` +
-      `<path d="M150 70Q120 120 150 180Q170 230 214 220" stroke="#9fe0ff" stroke-width="16" fill="none" stroke-linecap="round"/>` +
+      `<g opacity="${op(".55")}">` +
+      `<path d="M150 70L162 18L178 54L196 48L190 86Q206 104 196 124L170 120Q150 112 140 96Z" fill="${SPRITE ? "#c4ecff" : "#9fe0ff"}" stroke="#e9fbff" stroke-width="2"/>` +
+      `<path d="M150 70Q120 120 150 180Q170 230 214 220" stroke="${SPRITE ? "#c4ecff" : "#9fe0ff"}" stroke-width="16" fill="none" stroke-linecap="round"/>` +
       `<path d="M168 86L182 80" stroke="#fff" stroke-width="3" stroke-linecap="round"/>` +
       `</g>`
     );
   return (
-    `<g opacity=".85">` +
+    `<g opacity="${op(".85")}">` +
     `<path d="M140 108Q130 60 150 34Q166 12 190 30Q212 52 204 86Q214 96 208 112Q196 104 190 118Q178 104 170 120Q160 106 150 120Z" fill="#3a3346"/>` +
     `<path d="M156 52L170 60L156 62Z M196 52L182 60L196 62Z" fill="#ff3b4f"/>` +
     `<path d="M160 78Q176 90 192 78" stroke="#ff3b4f" stroke-width="2" fill="none"/>` +
@@ -167,19 +174,28 @@ function mask(kind: NonNullable<Look["mask"]>, color: string, hair: string): str
   }
 }
 
-export function portrait(L: Look, expr: Expr = "idle"): string {
+export function portrait(L: Look, expr: Expr = "idle", sprite = false): string {
+  SPRITE = sprite;
+  try {
+    return draw(L, expr);
+  } finally {
+    SPRITE = false;
+  }
+}
+
+function draw(L: Look, expr: Expr): string {
   const long = L.dress === "kimono" || L.dress === "gown";
   const covered = L.dress === "suit" || L.dress === "armor";
   const back: string[] = [];
   const front: string[] = [];
 
-  if (L.big)
+  if (L.big && !SPRITE)
     for (let i = 0; i < 10; i++) {
       const a = (i / 10) * Math.PI * 2;
       back.push(`<path d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2Z" fill="#fff" opacity=".85" transform="translate(${(100 + Math.cos(a) * 88).toFixed(0)} ${(140 + Math.sin(a) * 118).toFixed(0)})"/>`);
     }
   if (L.familiar) back.push(familiar(L.familiar));
-  back.push(`<ellipse cx="100" cy="287" rx="50" ry="8" fill="#000" opacity=".25"/>`);
+  if (!SPRITE) back.push(`<ellipse cx="100" cy="287" rx="50" ry="8" fill="#000" opacity=".25"/>`);
   if (L.wings) back.push(wings(L));
   if (L.foxTails) back.push(tails(L.foxTails, L.hair, L.tailTip ?? "#fff", !!L.big));
   if (L.heartTail) back.push(`<path d="M108 168Q156 186 152 232Q150 252 136 250" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"/>` + p("M136 250c-8-8-16 0-8 8l8 7 7-8c7-9-2-15-7-7z", "#ff5fa8"));
@@ -191,6 +207,8 @@ export function portrait(L: Look, expr: Expr = "idle"): string {
   if (L.hairStyle === "long" || L.hairStyle === "twin") back.push(p("M72 60Q62 18 100 24Q138 18 128 60L138 172Q100 188 62 172Z", L.hair));
   else back.push(p("M72 60Q62 18 100 24Q138 18 128 60L130 94Q100 102 70 94Z", L.hair));
   if (L.hairStyle === "pony") back.push(p("M122 34Q168 40 156 138Q144 96 126 62Z", L.hair));
+  if (SPRITE && (L.hairStyle === "long" || L.hairStyle === "twin"))
+    back.push(mirror(line("M74 70Q68 120 70 168M80 96Q76 130 80 176", darken(L.hair, 0.78), 2.2)));
   if (L.hairStyle === "twin") back.push(mirror(p("M74 70Q40 120 52 230Q60 250 66 232Q58 150 84 92Z", L.hair) + line("M56 150Q62 146 68 150", "#fff", 3)));
 
   // long coat behind the legs
@@ -202,6 +220,7 @@ export function portrait(L: Look, expr: Expr = "idle"): string {
   if (!long) {
     front.push(mirror(`<path d="M91 190L89 282" stroke="${INK}" stroke-width="12.5" stroke-linecap="round"/><path d="M91 190L89 282" stroke="${leg}" stroke-width="10" stroke-linecap="round"/><path d="M90 232L89 282" stroke="${boot}" stroke-width="11" stroke-linecap="round"/>`));
     if (L.boots) front.push(mirror(line("M85 234H95", L.trim, 3)));
+    if (SPRITE) front.push(`<ellipse cx="84" cy="282" rx="7" ry="4" fill="${boot}"/><ellipse cx="106" cy="282" rx="7" ry="4" fill="${boot}"/>`);
     if (L.belts) front.push(mirror(`<rect x="84" y="200" width="13" height="5" rx="1" fill="${L.belts}" stroke="${INK}" stroke-width="1"/><rect x="88" y="200" width="4" height="5" fill="#e9c46a"/>`));
   }
 
@@ -237,25 +256,29 @@ export function portrait(L: Look, expr: Expr = "idle"): string {
   if (L.ears === "elf") front.push(mirror(p("M77 60L50 46L78 74Z", L.skin)));
   front.push(p("M76 58Q76 86 100 91Q124 86 124 58Q124 34 100 34Q76 34 76 58Z", L.skin));
   const blush = `<ellipse cx="84" cy="74" rx="5" ry="2.6" fill="#ff7aa8" opacity=".45"/>`;
-  const arc = (d: string) => line(d, INK, 1.8);
-  const openEye = `<ellipse cx="90" cy="65" rx="4.6" ry="6" fill="${L.eyes}" stroke="${INK}" stroke-width="1.2"/><circle cx="90" cy="66" r="2.4" fill="${INK}"/><circle cx="88.4" cy="63" r="1.5" fill="#fff"/>`;
+  const arc = (d: string) => line(d, INK, SPRITE ? 3.4 : 1.8);
+  const openEye = SPRITE
+    ? `<ellipse cx="89" cy="65" rx="5.4" ry="7.4" fill="${INK}"/><ellipse cx="89" cy="67" rx="3.8" ry="4.8" fill="${darken(L.eyes, 0.72)}"/><ellipse cx="89" cy="69" rx="3.2" ry="2.6" fill="${L.eyes}"/><rect x="85.4" y="60.4" width="3.4" height="3.4" fill="#fff"/><path d="M82 58Q89 54 96 58" stroke="${INK}" stroke-width="2.6" fill="none"/>`
+    : `<ellipse cx="90" cy="65" rx="4.6" ry="6" fill="${L.eyes}" stroke="${INK}" stroke-width="1.2"/><circle cx="90" cy="66" r="2.4" fill="${INK}"/><circle cx="88.4" cy="63" r="1.5" fill="#fff"/>`;
   const eye =
     expr === "happy" ? arc("M85 67Q90 59 95 67")
     : expr === "sleep" ? arc("M85 64Q90 69 95 64")
-    : expr === "sad" ? openEye + arc("M84 56L95 60")
-    : openEye + arc("M84 59Q90 55 96 59");
-  front.push(mirror((L.mask ? "" : eye) + blush));
+    : expr === "sad" ? openEye + (SPRITE ? "" : arc("M84 56L95 60"))
+    : openEye + (SPRITE ? "" : arc("M84 59Q90 55 96 59"));
+  front.push(mirror((L.mask ? "" : eye) + (SPRITE ? "" : blush)));
   const lip = L.mask ? "#b8325a" : "#c2456b";
   const mouth =
     expr === "happy" ? `<path d="M94 79Q100 88 106 79Z" fill="${lip}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>`
     : expr === "eat" ? `<ellipse cx="100" cy="82" rx="4.2" ry="4.8" fill="${lip}" stroke="${INK}" stroke-width="1.2"/>`
     : expr === "sad" ? arc("M95 83Q100 79 105 83")
     : expr === "sleep" ? arc("M97 81Q100 83 103 81")
-    : L.mask ? `<path d="M95 81Q100 84 105 81" stroke="${lip}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`
+    : L.mask ? `<path d="M95 81Q100 84 105 81" stroke="${lip}" stroke-width="${SPRITE ? 3.4 : 2.4}" fill="none" stroke-linecap="round"/>`
+    : SPRITE ? `<path d="M96 80H103" stroke="${lip}" stroke-width="3" fill="none"/>`
     : arc("M95 78Q100 82 105 78");
   front.push(mouth);
   if (L.mask && expr === "sleep") front.push(`<text x="118" y="40" font-size="12" fill="#fff" font-family="monospace">z</text>`);
   front.push(p("M75 60Q74 30 100 30Q126 30 125 60Q116 44 105 49Q100 39 92 51Q84 45 75 60Z", L.hair));
+  if (SPRITE) front.push(line("M90 34Q86 42 84 52M104 33Q108 40 112 48M97 33L95 44", darken(L.hair, 0.78), 2));
   if (L.ears === "fox" && L.mask !== "foxhelm") front.push(mirror(p("M79 40L72 10L97 29Z", L.hair) + `<path d="M80 34L77 19L90 29Z" fill="#ffb3c7"/>`));
   if (L.mask) front.push(mask(L.mask, L.maskColor ?? "#8a6b5a", L.hair));
   if (L.horns) front.push(mirror(p("M85 35Q72 22 80 6Q86 22 94 31Z", "#3a2148")));

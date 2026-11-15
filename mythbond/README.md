@@ -49,10 +49,23 @@ status bar, as Android requires.
 The native side is `android/app/src/main/java/com/osled/mythbond/` (`MainActivity` and
 `PetOverlayService`). In a browser the same button shows a preview of this mode.
 
+## Pixel sprites
+
+Characters are shown as pixel-art sprites (130×160 for heroines, 64×64 for charms and familiars),
+facing three-quarters left, with five expressions each, in `src/sprites/`. They are generated from
+the drawn characters in `src/portrait.ts`:
+
+```bash
+npm run sprites    # needs Playwright's Chromium: npx playwright install chromium
+```
+
+The generator turns her to a three-quarter view, snaps colours to her palette, shrinks to the
+sprite grid and adds hand-sprite style shading (lit from the top-left) and a dark outline.
+
 ## Adding character art
 
 Put a transparent PNG named after the form id (for example `kitsune_awakened.png`) in `src/art/`.
-It is picked up automatically; forms without a file show a placeholder. Form ids are listed in
+It is picked up automatically and replaces that form's pixel sprite. Form ids are listed in
 `docs/ART_PROMPTS.md`.
 
 ## Layout

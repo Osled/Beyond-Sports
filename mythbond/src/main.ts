@@ -1,6 +1,6 @@
 import "./style.css";
 import { ALL_FORMS, LINES, STAGE_NAMES, pickLine, type Form, type LineId } from "./data";
-import { artUrl, type Expr } from "./art";
+import { artUrl, isSprite, type Expr } from "./art";
 import {
   ASCEND_REQUIREMENT,
   PLAY_COST,
@@ -139,7 +139,23 @@ function drawPet(src?: string) {
   if (next !== shownSrc) petImg.src = shownSrc = next;
   petEl.classList.toggle("small", stageOf(pet) < 2);
   petEl.classList.toggle("charm", stageOf(pet) === 0);
+  petEl.classList.toggle("pixel", isSprite(formOf(pet)));
+  fitPet();
 }
+// Pixel sprites look best at whole-number scales; pick the largest that fits the stage.
+function fitPet() {
+  const pet = save.pet;
+  if (!pet) return;
+  const small = stageOf(pet) < 2;
+  const unit = small ? 64 : 160;
+  const room = stageEl.clientHeight * (small ? 0.5 : 0.95) - (desk && !isOverlay ? 0 : 4);
+  if (room <= 0) return;
+  let scale = Math.floor(room / unit);
+  if (scale < 1 || scale * unit < room * 0.72) scale = Math.max(0.5, Math.floor((room / unit) * 4) / 4);
+  if (desk && !isOverlay) scale = small ? 1.5 : 1.5;
+  petEl.style.height = `${Math.round(unit * scale)}px`;
+}
+window.addEventListener("resize", fitPet);
 function setExpr(e: Expr | null) {
   expr = e;
   drawPet();
