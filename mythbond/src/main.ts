@@ -27,7 +27,13 @@ import {
 declare global {
   interface Window {
     MythbondAndroid?: { startOverlay(): boolean };
-    MythbondOverlay?: { moveBy(dxDp: number): void; setExpanded(on: boolean): void; openApp(): void };
+    MythbondOverlay?: {
+      moveBy(dxDp: number): void;
+      dragBy(dxDp: number, dyDp: number): void;
+      setExpanded(on: boolean): void;
+      setWindow(wDp: number, hDp: number): void;
+      openApp(): void;
+    };
   }
 }
 const android = window.MythbondAndroid;
@@ -431,9 +437,9 @@ function openPlay() {
   const draw = (reveal = -1) => {
     $("panel").innerHTML =
       `<p class="ptitle">FIND THE STAR · ${round}/3</p><div class="cards">` +
-      [0, 1, 2].map((i) => `<button class="card ${i === cur ? "on" : ""}" data-i="${i}">${reveal < 0 ? "?" : i === star ? "★" : "·"}</button>`).join("") +
+      [0, 1, 2].map((i) => `<button class="pcard ${i === cur ? "on" : ""}" data-i="${i}">${reveal < 0 ? "?" : i === star ? "★" : "·"}</button>`).join("") +
       `</div><p class="hint">${reveal < 0 ? "A ▸ move · B ▸ pick" : reveal === star ? "Found it!" : "Not there..."}</p>`;
-    $("panel").querySelectorAll<HTMLButtonElement>(".card").forEach((c) => (c.onclick = () => pick(Number(c.dataset.i))));
+    $("panel").querySelectorAll<HTMLButtonElement>(".pcard").forEach((c) => (c.onclick = () => pick(Number(c.dataset.i))));
   };
   const nextRound = () => {
     if (round === 3) {
@@ -550,6 +556,7 @@ $("btn-c").onclick = () => press("c");
 document.addEventListener("keydown", (e) => {
   const k = e.key.toLowerCase();
   if (desk && k === "escape") return setDesk(false);
+  if (docked && !panel && k === "escape" && !isOverlay) return setDocked(false);
   if (k === "a" || k === "arrowright" || k === "arrowdown") press("a");
   else if (k === "b" || k === "enter" || k === " ") press("b");
   else if (k === "c" || k === "escape" || k === "backspace") press("c");
@@ -585,11 +592,58 @@ $("pill-skin").onclick = () => {
   say(`Shell: ${SKINS[(i + 1) % SKINS.length].name}`, 1200);
 };
 $("pill-desk").onclick = () => {
-  if (!android) return setDesk(true);
+  if (docked) return isOverlay ? overlay?.openApp() : setDocked(false);
+  if (!android) return enterHome();
   store();
   if (!android.startOverlay()) say("Allow \"display over other apps\", then tap Desktop again.", 4000);
 };
 $("pill-menu").onclick = openMenu;
+
+// ---------- home-screen styles: faded / solid device, or free roam ----------
+let docked = false;
+const DOCK_W = 230; // dp; the device keeps its 360:600 shape
+function enterHome() {
+  if (!save.pet || panel || busy) return;
+  if (save.deskStyle === "roam") setDesk(true);
+  else setDocked(true);
+}
+function applyDock() {
+  const d = $("device");
+  d.classList.toggle("faded", docked && save.deskStyle === "faded");
+  d.style.setProperty("--fade-level", String(save.deskFade / 100));
+}
+function setDocked(on: boolean) {
+  docked = on;
+  document.body.classList.toggle("docked", on);
+  applyDock();
+  $("pill-desk").textContent = on ? "Return" : "Desktop";
+  $("pill-menu").hidden = on;
+  if (on && overlay) overlay.setWindow(DOCK_W, Math.round((DOCK_W * 600) / 360));
+  if (on && !isOverlay) say(save.deskStyle === "faded" ? "Home-screen preview. Touch the shell to show it; Return goes back." : "Home-screen preview. Return goes back.", 3500);
+  render();
+}
+let revealTimer = 0;
+$("device").addEventListener("pointerdown", () => {
+  if (!docked) return;
+  $("device").classList.add("reveal");
+  clearTimeout(revealTimer);
+  revealTimer = window.setTimeout(() => $("device").classList.remove("reveal"), 4000);
+});
+// Drag the floating device around the home screen by its shell.
+let drag: { x: number; y: number } | null = null;
+$("device").addEventListener("pointerdown", (e) => {
+  if (!docked || !overlay || (e.target as HTMLElement).closest("button, .screen")) return;
+  drag = { x: e.screenX, y: e.screenY };
+});
+window.addEventListener("pointermove", (e) => {
+  if (!drag || !overlay) return;
+  const dx = e.screenX - drag.x;
+  const dy = e.screenY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) < 2) return;
+  overlay.dragBy(dx, dy);
+  drag = { x: e.screenX, y: e.screenY };
+});
+window.addEventListener("pointerup", () => (drag = null));
 
 function setDesk(on: boolean) {
   if (isOverlay && !on) return overlay?.openApp();
@@ -647,7 +701,7 @@ function closeDeskMenu() {
 let expanded = false;
 function expand() {
   const on = !$("desk-menu").hidden || !$("bubble").hidden;
-  if (!overlay || on === expanded) return;
+  if (!overlay || !desk || on === expanded) return;
   expanded = on;
   overlay.setExpanded(on);
 }
@@ -728,6 +782,34 @@ function openMenu() {
   seg.className = "seg";
   for (const v of [1, 10, 60]) seg.append(btn(`${v}×`, () => ((save.speed = v), store(), openMenu()), `segb ${save.speed === v ? "on" : ""}`));
   speed.append(seg);
+  const home = mk("Home-screen style");
+  const hs = document.createElement("div");
+  hs.className = "seg";
+  for (const [v, label] of [["faded", "Faded shell"], ["solid", "Solid shell"], ["roam", "Free roam"]] as const)
+    hs.append(btn(label, () => ((save.deskStyle = v), store(), openMenu()), `segb ${save.deskStyle === v ? "on" : ""}`));
+  home.append(hs);
+  if (save.deskStyle === "faded") {
+    const row = document.createElement("label");
+    row.className = "slider";
+    row.innerHTML = `<span>Shell opacity</span><input type="range" id="fade" min="10" max="90" step="5" value="${save.deskFade}" /><b id="fade-v">${save.deskFade}%</b>`;
+    const input = row.querySelector("input")!;
+    input.oninput = () => {
+      save.deskFade = Number(input.value);
+      $("fade-v").textContent = `${save.deskFade}%`;
+      applyDock();
+      store();
+    };
+    home.append(row);
+  }
+  const hint = document.createElement("p");
+  hint.className = "mhint";
+  hint.textContent =
+    save.deskStyle === "faded"
+      ? "The device stays on your home screen, see-through, with her fully visible. Touch it to bring the shell back."
+      : save.deskStyle === "solid"
+        ? "The whole device stays on your home screen."
+        : "She walks along the bottom of your home screen on her own. Tap her for care.";
+  home.append(hint);
   const more = mk("Companion");
   more.append(btn(`Spirit album · ${save.album.length}/${ALL_FORMS.length}`, openAlbum, "mbtn ghost"));
   if (save.pet) {
@@ -796,7 +878,7 @@ function wander() {
   if (Math.random() < 0.6) {
     const dir = Math.random() < 0.5 ? -1 : 1;
     facing = dir;
-    if (overlay) overlay.moveBy(dir * 22); // the whole window walks along the home screen
+    if (overlay && desk) overlay.moveBy(dir * 22); // the whole window walks along the home screen
     else x = desk ? clamp(x + dir * 3, 6, 94) : clamp(x + dir * 9, 24, 76);
     place();
     $("zzz").style.left = `${x}%`;
@@ -848,5 +930,6 @@ document.addEventListener("visibilitychange", () => {
 });
 if (isOverlay) {
   x = 50;
-  setDesk(true);
+  if (save.deskStyle === "roam") setDesk(true);
+  else setDocked(true);
 }

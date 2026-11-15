@@ -91,8 +91,14 @@ eating, sleepy, sad).
 
 ## Home-screen mode (Android)
 
-The Desktop pill puts her on the phone's home screen in a small floating window over other apps.
-She keeps walking left and right along the bottom of the screen and shows a blinking icon when
+The Desktop pill puts her on the phone's home screen in a floating window over other apps, in one
+of three styles (Menu → Home-screen style):
+
+- **Faded shell**: the device floats on the home screen with every part of it except her drawn at a
+  chosen opacity (10–90%, default 35%). Touch or hover brings it back to full for four seconds.
+  It can be dragged by the shell.
+- **Solid shell**: the same, fully visible.
+- **Free roam**: she walks left and right along the bottom of the screen and shows a blinking icon when
 she needs something. Tapping her opens a care menu (feed, treat, clean, lights, heal, talk);
 Play, Train and 📟 return to the device. The overlay and the app share one save; whichever is
 showing is the one that updates it.

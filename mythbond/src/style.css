@@ -43,6 +43,8 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- shell + skins ---------- */
+/* --fade dims every part of the device except the companion (faded home-screen style). */
+@property --fade { syntax: "<number>"; inherits: true; initial-value: 1; }
 .device {
   --s1: #ffd6e7; --s2: #ff9cc6; --edge: #d9649a; --btn: #fff3f8; --btn-edge: #d9649a; --ink: #7a1f4f; --bezel: #3a2340;
   --pattern: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.55) 0 3px, transparent 4px) 0 0 / 34px 34px;
@@ -56,11 +58,23 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   gap: 3.2%;
   padding: 11% 8.5% 8%;
   border-radius: 50% 50% 44% 44% / 36% 36% 64% 64%;
+  container-type: inline-size;
+  isolation: isolate;
+  --fade: 1;
+  transition: --fade 0.35s ease;
+}
+.device::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit;
   background: var(--pattern), radial-gradient(80% 60% at 35% 20%, rgba(255, 255, 255, 0.55), transparent 60%), linear-gradient(160deg, var(--s1), var(--s2));
   border: 3px solid var(--edge);
   box-shadow: inset -10px -14px 0 rgba(0, 0, 0, 0.12), inset 8px 10px 0 rgba(255, 255, 255, 0.35), 0 18px 40px rgba(0, 0, 0, 0.45);
-  container-type: inline-size;
+  opacity: var(--fade);
 }
+.device.faded { --fade: var(--fade-level, 0.35); }
+.device.faded:hover, .device.faded.reveal, .device.faded:has(:focus-visible) { --fade: 1; }
+.brand, .icons, .btns, .pills, .call:not(.on) { opacity: var(--fade); }
 .device[data-skin="midnight"] {
   --s1: #5b48a8; --s2: #1d1640; --edge: #120d2b; --btn: #ffd45c; --btn-edge: #b98a12; --ink: #e9e1ff; --bezel: #0d0920;
   --pattern: radial-gradient(circle, #fff 0 1px, transparent 1.5px) 0 0 / 23px 29px, radial-gradient(circle, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.5px) 11px 14px / 31px 37px;
@@ -72,8 +86,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .device[data-skin="crystal"] {
   --s1: rgba(200, 238, 255, 0.55); --s2: rgba(110, 170, 255, 0.4); --edge: rgba(160, 215, 255, 0.9); --btn: rgba(255, 255, 255, 0.85); --btn-edge: #6aa8e8; --ink: #0f3b66; --bezel: rgba(10, 30, 60, 0.85);
   --pattern: linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, 0.45) 45%, transparent 52%) 0 0 / 100% 100%;
-  backdrop-filter: blur(6px);
 }
+.device[data-skin="crystal"]::before { backdrop-filter: blur(6px); }
 .device[data-skin="royal"] {
   --s1: #fff1c2; --s2: #d9a63a; --edge: #9c6f12; --btn: #b0283f; --btn-edge: #6e1424; --ink: #5a3a00; --bezel: #3a1420;
   --pattern: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.18) 0 2px, transparent 2px 14px);
@@ -88,8 +102,15 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   gap: 4px;
   padding: 6px 8px 8px;
   border-radius: 20px 20px 26px 26px;
+  isolation: isolate;
+}
+.bezel::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit;
   background: var(--bezel);
   box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 2px 0 rgba(255, 255, 255, 0.35);
+  opacity: var(--fade);
 }
 .icons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
 .ico {
@@ -120,17 +141,23 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   aspect-ratio: 10 / 9;
   border-radius: 10px;
   overflow: hidden;
-  background: radial-gradient(100% 75% at 50% 25%, color-mix(in srgb, var(--c1) 55%, var(--lcd-paper)), color-mix(in srgb, var(--c2) 60%, var(--lcd-paper)));
   font-family: var(--font-pixel);
   color: var(--lcd-ink);
+}
+.screen::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(100% 75% at 50% 25%, color-mix(in srgb, var(--c1) 55%, var(--lcd-paper)), color-mix(in srgb, var(--c2) 60%, var(--lcd-paper)));
+  opacity: var(--fade);
 }
 .screen::after { /* LCD pixel grid */
   content: "";
   position: absolute; inset: 0; pointer-events: none; z-index: 6;
+  opacity: var(--fade);
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.07) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 3px);
 }
 .stage { position: absolute; inset: 0; overflow: hidden; }
-.floor { position: absolute; left: 0; right: 0; bottom: 0; height: 14%; background: color-mix(in srgb, var(--c2) 40%, transparent); border-top: 2px solid color-mix(in srgb, var(--lcd-ink) 25%, transparent); }
+.floor { opacity: var(--fade); position: absolute; left: 0; right: 0; bottom: 0; height: 14%; background: color-mix(in srgb, var(--c2) 40%, transparent); border-top: 2px solid color-mix(in srgb, var(--lcd-ink) 25%, transparent); }
 
 .pet {
   position: absolute;
@@ -230,8 +257,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .opt { text-align: left; padding: 4px 2px; font-family: inherit; color: inherit; }
 .opt.on { background: var(--lcd-ink); color: var(--lcd-paper); }
 .cards { display: flex; gap: 8%; justify-content: center; margin: 6px 0; }
-.card { flex: 0 1 26%; aspect-ratio: 3 / 4; border: 3px solid var(--lcd-ink); border-radius: 6px; font: 1.8em var(--font-pixel); color: var(--lcd-ink); }
-.card.on { background: var(--lcd-ink); color: var(--lcd-paper); }
+.pcard { flex: 0 1 26%; aspect-ratio: 3 / 4; border: 3px solid var(--lcd-ink); border-radius: 6px; font: 1.8em var(--font-pixel); color: var(--lcd-ink); }
+.pcard.on { background: var(--lcd-ink); color: var(--lcd-paper); }
 .timing { position: relative; height: 24px; border: 3px solid var(--lcd-ink); margin: 8px 4px; }
 .zone { position: absolute; left: 37.5%; width: 25%; top: 0; bottom: 0; background: color-mix(in srgb, var(--lcd-ink) 30%, transparent); }
 .marker { position: absolute; top: -7px; bottom: -7px; width: 6px; translate: -50% 0; background: var(--lcd-ink); }
@@ -283,6 +310,13 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .desk-menu button { height: 44px; border-radius: 10px; font-size: 22px; background: rgba(0, 0, 0, 0.06); }
 .desk-hint { position: fixed; top: 16px; left: 50%; translate: -50% 0; width: min(90%, 420px); margin: 0; text-align: center; color: var(--muted); font-size: 13px; }
 
+/* Docked device on the home screen (faded / solid styles). */
+.docked #app { align-items: flex-end; justify-content: flex-end; }
+.docked .device { width: 230px; }
+.docked .bubble { font-size: 11px; }
+.overlay.docked #app { padding: 0; align-items: stretch; justify-content: stretch; }
+.overlay.docked .device { width: 100%; max-height: none; touch-action: none; }
+
 /* The floating Android overlay window: transparent, pet-sized, grows while the menu is open. */
 body.overlay { background: transparent; }
 .overlay .desk { inset: 0; height: auto; }
@@ -322,7 +356,11 @@ body.overlay { background: transparent; }
 .swatch[data-skin="crystal"] { background: linear-gradient(160deg, #c8eeff, #8ab8ff); color: #0f3b66; }
 .swatch[data-skin="royal"] { background: linear-gradient(160deg, #fff1c2, #d9a63a); color: #5a3a00; }
 .seg { display: flex; gap: 8px; }
-.segb { flex: 1; padding: 10px; border-radius: 12px; background: var(--panel-2); font-weight: 800; }
+.slider { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.slider input { flex: 1; min-width: 0; accent-color: var(--accent); }
+.slider b { width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; }
+.mhint { margin: 0; color: var(--muted); font-size: 12.5px; }
+.segb { flex: 1; padding: 10px 6px; font-size: 13px; border-radius: 12px; background: var(--panel-2); font-weight: 800; }
 .segb.on { background: var(--accent); color: #1a0f2c; }
 .adopt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .adopt-opt { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 8px 12px; border-radius: 18px; background: linear-gradient(180deg, var(--c1), var(--c2)); color: #fff; }

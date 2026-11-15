@@ -46,6 +46,8 @@ export interface Save {
   lastSeen: number; // wall-clock ms
   departed: string | null; // name of a companion who left from neglect
   skin: string; // device shell skin
+  deskStyle: "faded" | "solid" | "roam"; // how she appears on the home screen
+  deskFade: number; // shell opacity (%) for the faded style
 }
 
 export type GameEvent =
@@ -56,7 +58,7 @@ export type GameEvent =
 const clamp = (v: number, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
 
 export function newSave(now: number): Save {
-  return { pet: null, album: [], speed: 1, lastSeen: now, departed: null, skin: "sakura" };
+  return { pet: null, album: [], speed: 1, lastSeen: now, departed: null, skin: "sakura", deskStyle: "faded", deskFade: 35 };
 }
 
 export function adopt(save: Save, line: LineId): void {

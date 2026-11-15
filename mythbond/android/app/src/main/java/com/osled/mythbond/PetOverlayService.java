@@ -134,7 +134,7 @@ public class PetOverlayService extends Service {
         lp.width = dp(wDp);
         lp.height = dp(hDp);
         lp.x = Math.max(0, Math.min(dm.widthPixels - lp.width, centre - lp.width / 2));
-        lp.y = bottom - lp.height;
+        lp.y = Math.max(0, bottom - lp.height);
         wm.updateViewLayout(web, lp);
     }
 
@@ -147,6 +147,26 @@ public class PetOverlayService extends Service {
                 DisplayMetrics dm = getResources().getDisplayMetrics();
                 lp.x = Math.max(0, Math.min(dm.widthPixels - lp.width, lp.x + dp(dxDp)));
                 wm.updateViewLayout(web, lp);
+            });
+        }
+
+        /** Drag the window by the given distance (used by the docked device). */
+        @JavascriptInterface
+        public void dragBy(final int dxDp, final int dyDp) {
+            ui.post(() -> {
+                if (web == null) return;
+                DisplayMetrics dm = getResources().getDisplayMetrics();
+                lp.x = Math.max(0, Math.min(dm.widthPixels - lp.width, lp.x + dp(dxDp)));
+                lp.y = Math.max(0, Math.min(dm.heightPixels - lp.height, lp.y + dp(dyDp)));
+                wm.updateViewLayout(web, lp);
+            });
+        }
+
+        /** Set the window size, keeping its bottom-centre in place (used by the docked device). */
+        @JavascriptInterface
+        public void setWindow(final int wDp, final int hDp) {
+            ui.post(() -> {
+                if (web != null) resize(wDp, hDp);
             });
         }
 

@@ -32,9 +32,17 @@ npm run android:open    # open in Android Studio, then Run / Build APK
 
 ### Home-screen mode
 
-The **Desktop** pill sends her out onto your phone's home screen: the app goes to the background
-and she walks along the bottom of the screen in a small floating window, over other apps. Tap her
-for a care menu; 📟 (or opening the app) brings her back into the device. The first time, Android
+The **Desktop** pill sends her out onto your phone's home screen, floating over other apps.
+Choose how under **Menu → Home-screen style**:
+
+- **Faded shell** (default): the whole device floats on the home screen. The shell, screen and
+  buttons are see-through (set the opacity with the slider, 10–90%), while she stays fully
+  visible. Touching the device brings the shell back to full for a few seconds. Drag it by the
+  shell to move it.
+- **Solid shell**: the same device, fully visible.
+- **Free roam**: just her, walking along the bottom of the screen. Tap her for a care menu.
+
+**Return** (or opening the app) brings her back into the app. The first time, Android
 asks you to allow "Display over other apps". While she's out, a quiet notification stays in the
 status bar, as Android requires.
 
