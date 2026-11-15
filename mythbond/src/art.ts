@@ -1,6 +1,7 @@
 // Character art lookup. Drop a PNG named <formId>.png into src/art/ and it is used
 // automatically; forms without art get a generated placeholder.
 import { LINES, type Form } from "./data";
+import { LOOKS, portrait } from "./portrait";
 
 const files = import.meta.glob("./art/*.png", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
 const ART: Record<string, string> = {};
@@ -8,8 +9,11 @@ for (const [path, url] of Object.entries(files)) ART[path.slice(path.lastIndexOf
 
 export const hasArt = (form: Form) => form.id in ART;
 
+const uri = (svg: string) => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+
 function placeholder(form: Form): string {
   const [c1] = LINES[form.line].colors;
+  if (LOOKS[form.id]) return uri(portrait(LOOKS[form.id], c1));
   const size = [58, 64, 76, 84][form.stage];
   const rays =
     form.stage === 3
@@ -21,7 +25,7 @@ function placeholder(form: Form): string {
 <ellipse cx="100" cy="212" rx="48" ry="9" fill="#000" opacity=".25"/>
 <text x="100" y="${120 + size * 0.36}" font-size="${size}" text-anchor="middle">${form.glyph}</text>
 </svg>`;
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  return uri(svg);
 }
 
 export const artUrl = (form: Form): string => ART[form.id] ?? placeholder(form);
