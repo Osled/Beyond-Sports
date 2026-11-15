@@ -8,7 +8,6 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "android:add": "cap add android",
     "android:sync": "npm run build && cap sync android",
     "android:open": "cap open android"
   },

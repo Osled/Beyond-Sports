@@ -11,7 +11,7 @@ for (const f of files.filter((f) => f.endsWith(".png"))) {
 }
 const html = `<title>Mythbond</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Nunito:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=DotGothic16&family=Nunito:wght@400;600;700;800&display=swap">
 <style>${css}</style>
 <div id="app"></div>
 <script type="module">${js.replace(/<\/script/g, "<\\/script")}</script>

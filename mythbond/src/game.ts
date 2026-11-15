@@ -45,6 +45,7 @@ export interface Save {
   speed: number; // time multiplier (1 = real time)
   lastSeen: number; // wall-clock ms
   departed: string | null; // name of a companion who left from neglect
+  skin: string; // device shell skin
 }
 
 export type GameEvent =
@@ -55,7 +56,7 @@ export type GameEvent =
 const clamp = (v: number, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, v));
 
 export function newSave(now: number): Save {
-  return { pet: null, album: [], speed: 1, lastSeen: now, departed: null };
+  return { pet: null, album: [], speed: 1, lastSeen: now, departed: null, skin: "sakura" };
 }
 
 export function adopt(save: Save, line: LineId): void {
@@ -307,6 +308,18 @@ export function toneOf(pet: Pet): Tone {
   if (pet.energy < 20) return "sleepy";
   if (pet.mood < 30) return "sad";
   return pet.mood >= 65 ? "happy" : "neutral";
+}
+
+export type NeedKind = "heal" | "meal" | "clean" | "sleep" | "talk";
+/** The care action that would help most right now, if any. */
+export function needKind(pet: Pet): NeedKind | null {
+  if (stageOf(pet) === 0 || pet.asleep) return null;
+  if (pet.sick) return "heal";
+  if (pet.fullness < 25) return "meal";
+  if (pet.mess >= 2 || pet.clean < 25) return "clean";
+  if (pet.energy < 20) return "sleep";
+  if (pet.mood < 30) return "talk";
+  return null;
 }
 
 /** What she needs most right now, for the status line. */

@@ -59,11 +59,43 @@ happy, neutral, sad, hungry, sleepy and sick moods.
   spirit realm and you pick a new charm. The album is kept. Nothing dies.
 - **Away time:** at most 8 h is simulated, needs never drop below 10, and she cannot leave or fall sick.
 
-## Screens
+## The device
 
-- **Home** — name and stage, the room with the companion, need chip, speech bubble, four need
-  gauges, Bond / Power / age, growth bar, and a 4×2 care pad.
-- **Choose your charm**, **Evolution reveal**, **Album**, **Settings**, and the two mini-games are overlays.
+The game is shown as a handheld V-pet: an egg-shaped shell with a small screen, four icons above
+and four below it, an attention light, and three buttons.
+
+- **Icons:** Status, Feed, Train, Play / Clean, Lights, Heal, Talk. The icon for her most urgent
+  need blinks, and the "!" light comes on.
+- **Buttons:** A cycles the icons, B confirms, C cancels. Icons can also be tapped directly.
+- **Status** pages: name, stage and age; Food, Mood, Energy and Clean as four hearts each;
+  Bond, Power and growth.
+- **Shell skins:** Sakura, Midnight, Matcha, Crystal, Royal (Skin pill cycles them; Menu shows all).
+
+## Animations
+
+Movement is stepped, like an LCD pet: she walks left and right across the screen in small jumps,
+turning to face the way she walks. Placeholder heroines have five expressions (idle, happy,
+eating, sleepy, sad).
+
+| Action | Animation |
+|---|---|
+| Feed | The food appears beside her; she takes three bites and it shrinks with each one, then she hops |
+| Refuses | Shakes her head (turns back and forth) with a sad face |
+| Clean | A wave sweeps across the screen and washes the leaves away |
+| Lights | The screen dims, she closes her eyes and "zZz" floats up |
+| Heal | A syringe comes down to her, she flinches, then sparkles and a happy hop |
+| Train | After the timing game she faces a log and fires energy shots; hits make it shake |
+| Play | After Find the Star she does a happy dance |
+| Talk | Speech bubble with a line that matches her mood |
+| Evolve | The screen flashes while old and new forms alternate, then sparkles and a reveal card |
+
+## Home-screen mode (Android)
+
+The Desktop pill puts her on the phone's home screen in a small floating window over other apps.
+She keeps walking left and right along the bottom of the screen and shows a blinking icon when
+she needs something. Tapping her opens a care menu (feed, treat, clean, lights, heal, talk);
+Play, Train and 📟 return to the device. The overlay and the app share one save; whichever is
+showing is the one that updates it.
 
 ## Next steps
 

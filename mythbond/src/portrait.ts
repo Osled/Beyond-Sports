@@ -64,12 +64,13 @@ function item(kind: NonNullable<Look["item"]>, trim: string): string {
   }
 }
 
-export function portrait(L: Look, aura: string): string {
+export type Expr = "idle" | "happy" | "eat" | "sleep" | "sad";
+
+export function portrait(L: Look, expr: Expr = "idle"): string {
   const long = L.dress === "kimono" || L.dress === "gown";
   const back: string[] = [];
   const front: string[] = [];
 
-  back.push(`<circle cx="100" cy="140" r="${L.big ? 128 : 105}" fill="url(#a)"/>`);
   if (L.big) for (let i = 0; i < 10; i++) {
     const a = (i / 10) * Math.PI * 2;
     back.push(`<path d="M0-7L2-2 7 0 2 2 0 7-2 2-7 0-2-2Z" fill="#fff" opacity=".85" transform="translate(${(100 + Math.cos(a) * 88).toFixed(0)} ${(140 + Math.sin(a) * 118).toFixed(0)})"/>`);
@@ -110,14 +111,28 @@ export function portrait(L: Look, aura: string): string {
   // head
   if (L.ears === "elf") front.push(mirror(p("M77 60L50 46L78 74Z", L.skin)));
   front.push(p("M76 58Q76 86 100 91Q124 86 124 58Q124 34 100 34Q76 34 76 58Z", L.skin));
-  front.push(mirror(`<ellipse cx="90" cy="65" rx="4.6" ry="6" fill="${L.eyes}" stroke="${INK}" stroke-width="1.2"/><circle cx="90" cy="66" r="2.4" fill="${INK}"/><circle cx="88.4" cy="63" r="1.5" fill="#fff"/><path d="M84 59Q90 55 96 59" stroke="${INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/><ellipse cx="84" cy="74" rx="5" ry="2.6" fill="#ff7aa8" opacity=".45"/>`));
-  front.push(`<path d="M95 78Q100 82 105 78" stroke="${INK}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`);
+  const blush = `<ellipse cx="84" cy="74" rx="5" ry="2.6" fill="#ff7aa8" opacity=".45"/>`;
+  const arc = (d: string) => `<path d="${d}" stroke="${INK}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+  const openEye = `<ellipse cx="90" cy="65" rx="4.6" ry="6" fill="${L.eyes}" stroke="${INK}" stroke-width="1.2"/><circle cx="90" cy="66" r="2.4" fill="${INK}"/><circle cx="88.4" cy="63" r="1.5" fill="#fff"/>`;
+  const eye =
+    expr === "happy" ? arc("M85 67Q90 59 95 67")
+    : expr === "sleep" ? arc("M85 64Q90 69 95 64")
+    : expr === "sad" ? openEye + arc("M84 56L95 60")
+    : openEye + arc("M84 59Q90 55 96 59");
+  front.push(mirror(eye + blush));
+  const mouth =
+    expr === "happy" ? `<path d="M94 77Q100 87 106 77Z" fill="#c2456b" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+    : expr === "eat" ? `<ellipse cx="100" cy="80" rx="4.2" ry="4.8" fill="#c2456b" stroke="${INK}" stroke-width="1.2"/>`
+    : expr === "sad" ? arc("M95 81Q100 77 105 81")
+    : expr === "sleep" ? arc("M97 79Q100 81 103 79")
+    : arc("M95 78Q100 82 105 78");
+  front.push(mouth);
   front.push(p("M75 60Q74 30 100 30Q126 30 125 60Q116 44 105 49Q100 39 92 51Q84 45 75 60Z", L.hair));
   if (L.ears === "fox") front.push(mirror(p("M79 40L72 10L97 29Z", L.hair) + `<path d="M80 34L77 19L90 29Z" fill="#ffb3c7"/>`));
   if (L.horns) front.push(mirror(p("M85 35Q72 22 80 6Q86 22 94 31Z", "#3a2148")));
   if (L.crown) front.push(p("M85 33L86 19L93 27L100 14L107 27L114 19L115 33Z", "#ffd45c") + `<circle cx="100" cy="25" r="2.5" fill="#ff5fa8"/>`);
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -20 260 320"><defs><radialGradient id="a"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".55" stop-color="${aura}" stop-opacity=".5"/><stop offset="1" stop-color="${aura}" stop-opacity="0"/></radialGradient></defs>${back.join("")}${front.join("")}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -20 260 320">${back.join("")}${front.join("")}</svg>`;
 }
 
 const S = "#ffe3d0";
